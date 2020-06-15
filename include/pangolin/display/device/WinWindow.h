@@ -68,6 +68,10 @@ struct WinWindow : public PangolinGl
         return hGLRC;
     }
 
+    HWND GetWindowHandle() {
+        return hWnd;
+    }
+
 private:
     static LRESULT APIENTRY WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
