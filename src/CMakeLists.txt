@@ -8,6 +8,7 @@ endmacro()
 
 ## Header only includes / core headers
 set( INCDIR "../include/pangolin" )
+
 set( HEADERS
   ${INCDIR}/pangolin.h
   ${INCDIR}/platform.h
@@ -204,8 +205,12 @@ elseif(IOS)
 else()
     if(BUILD_PANGOLIN_GUI)
         if(_WIN_)
-            list(APPEND WINDOW_FACTORY_REG RegisterWinWindowFactory)
-            list(APPEND SOURCES display/device/display_win.cpp )
+            find_package(glfw3 CONFIG REQUIRED)
+            list(APPEND LINK_LIBS glfw )
+            list(APPEND WINDOW_FACTORY_REG RegisterGLFWWindowFactory)
+            list(APPEND SOURCES display/device/display_glfw.cpp )
+            #list(APPEND WINDOW_FACTORY_REG RegisterWinWindowFactory)
+            #list(APPEND SOURCES display/device/display_win.cpp )
         elseif(_OSX_)
             list(APPEND WINDOW_FACTORY_REG RegisterOsxWindowFactory)
             list(APPEND SOURCES display/device/display_osx.mm display/device/PangolinNSApplication.mm display/device/PangolinNSGLView.mm  )
@@ -335,16 +340,14 @@ endif()
 
 option(BUILD_PANGOLIN_EIGEN "Build support for Eigen matrix types" ON)
 if(BUILD_PANGOLIN_EIGEN)
-  find_package(Eigen QUIET)
-  if(EIGEN_FOUND)
-    set(HAVE_EIGEN 1)
-    list(APPEND USER_INC  ${EIGEN_INCLUDE_DIR} )
+  find_package(Eigen3 CONFIG REQUIRED)
+  set(HAVE_EIGEN 1)
+  list(APPEND LINK_LIBS Eigen3::Eigen)
     if(_CLANG_)
       # Eigen causes many of these errors. Suppress.
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register")
     endif()
     message(STATUS "Eigen Found and Enabled")
-  endif()
 endif()
 
 option(BUILD_PANGOLIN_TOON "Build support for TooN matrix types" ON)
@@ -547,13 +550,15 @@ endif()
 option(BUILD_PANGOLIN_LIBPNG "Build support for libpng image input" ON)
 if(BUILD_PANGOLIN_LIBPNG)
   if(NOT BUILD_EXTERN_LIBPNG)
-    find_package(PNG QUIET)
+  #  find_package(PNG QUIET)
+    find_package(libpng CONFIG REQUIRED)
   endif()
   if(PNG_FOUND)
     # (ZLIB is also found by FindPNG.cmake as its dependency)
     set(HAVE_PNG 1)
-    list(APPEND INTERNAL_INC ${PNG_INCLUDE_DIR} )
-    list(APPEND LINK_LIBS ${PNG_LIBRARY} ${ZLIB_LIBRARY} )
+ #   list(APPEND INTERNAL_INC ${PNG_INCLUDE_DIR} )
+ #   list(APPEND LINK_LIBS ${PNG_LIBRARY} ${ZLIB_LIBRARY} )
+    list(APPEND LINK_LIBS png )
     message(STATUS "libpng Found and Enabled")
   endif()
 endif()
@@ -595,11 +600,11 @@ endif()
 
 option(BUILD_PANGOLIN_ZSTD "Build support for libzstd compression" ON)
 if(BUILD_PANGOLIN_ZSTD)
-  find_package(zstd QUIET)
+  find_package(zstd CONFIG REQUIRED)
   if(zstd_FOUND)
     set(HAVE_ZSTD 1)
-    list(APPEND INTERNAL_INC ${zstd_INCLUDE_DIR} )
-    list(APPEND LINK_LIBS ${zstd_LIBRARY} )
+   # list(APPEND INTERNAL_INC ${zstd_INCLUDE_DIR} )
+    list(APPEND LINK_LIBS libzstd )
     message(STATUS "libzstd Found and Enabled")
   endif()
 endif()
@@ -614,6 +619,8 @@ if(BUILD_PANGOLIN_LZ4)
     message(STATUS "liblz4 Found and Enabled")
   endif()
 endif()
+
+list(APPEND LINK_LIBS imgui )
 
 #######################################################
 ## Embed resource binary files
@@ -636,6 +643,7 @@ target_include_directories(${LIBRARY_NAME} SYSTEM PUBLIC ${USER_INC} PRIVATE ${I
 target_include_directories(${LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                                                   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
                                                   $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>)
+
 target_link_libraries(${LIBRARY_NAME} PUBLIC ${LINK_LIBS})
 
 ## Generate symbol export helper header on MSVC
@@ -735,7 +743,8 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY IMMEDIATE )
 
 # Install tree config
-set( EXPORT_LIB_INC_DIR "\${PROJECT_CMAKE_DIR}/${REL_INCLUDE_DIR}" )
+#set( EXPORT_LIB_INC_DIR "\${PROJECT_CMAKE_DIR}/${REL_INCLUDE_DIR}" )
+set( EXPORT_LIB_INC_DIR "\${PROJECT_CMAKE_DIR}/../../include" )
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY )
 
@@ -756,7 +765,9 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/include/${LIBRARY_NAME}/config.h"
 install(DIRECTORY ${INCDIR}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/${INSTALL_INCLUDE_DIR}
 )
-install(TARGETS ${LIBRARY_NAME}
+
+
+install(TARGETS ${LIBRARY_NAME} imgui
   EXPORT ${PROJECT_NAME}Targets
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

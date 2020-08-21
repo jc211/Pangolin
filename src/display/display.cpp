@@ -325,6 +325,12 @@ void PostRender()
     Viewport::DisableScissor();
 }
 
+void StartFrame()
+{
+    context->InitializeFrame();
+}
+
+
 void FinishFrame()
 {
     RenderViews();

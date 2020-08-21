@@ -21,13 +21,12 @@ option( BUILD_TESTS "Build Tests" ON )
 option( BUILD_TOOLS "Build Examples" ON )
 option( BUILD_EXAMPLES "Build Tools" ON )
 
-set (CMAKE_CXX_STANDARD 20)
-
+add_subdirectory("imgui")
 if(_WIN_)
     option( BUILD_SHARED_LIBS    "Build Shared Library" OFF)
-    option( BUILD_EXTERN_GLEW    "Automatically download, build and compile GLEW" ON)
-    option( BUILD_EXTERN_LIBPNG  "Automatically download, build and compile libpng" ON)
-    option( BUILD_EXTERN_LIBJPEG "Automatically download, build and compile libjpeg" ON)
+    option( BUILD_EXTERN_GLEW    "Automatically download, build and compile GLEW" OFF)
+    option( BUILD_EXTERN_LIBPNG  "Automatically download, build and compile libpng" OFF)
+    option( BUILD_EXTERN_LIBJPEG "Automatically download, build and compile libjpeg" OFF)
     option( MSVC_USE_STATIC_CRT  "Use static C Runtime with MSVC, /MT instead of /MD" ON)
 
     # Make sure there are no erroneous C Runtime flags
@@ -86,6 +85,7 @@ configure_file(
     "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY
 )
+
 
 add_custom_target(pangolin_uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")

@@ -87,6 +87,10 @@ namespace pangolin
   
   /// Perform any post rendering, event processing and frame swapping.
   PANGOLIN_EXPORT
+  void StartFrame();
+
+  /// Perform any post rendering, event processing and frame swapping.
+  PANGOLIN_EXPORT
   void FinishFrame();
 
   /// Request that the window close.

@@ -125,7 +125,10 @@ struct PANGOLIN_EXPORT PangolinGl : public WindowInterface
     virtual void Resize(unsigned int /*w*/, unsigned int /*h*/) override {
         pango_print_warn("Resize: Not available with non-pangolin window.\n");
     }
-
+    
+    virtual void InitializeFrame() override {
+        pango_print_warn("InitializeFrame: Not available with non-pangolin window.\n");
+    }
 
 };
 

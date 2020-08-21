@@ -33,6 +33,25 @@
 
 #include <pangolin/display/device/WinWindow.h>
 #include <memory>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_win32.h>
+
+
+static void imgui_initialize(void* hwnd, void* gl_context) {
+	//ImGui_ImplWin32_EnableDpiAwareness();
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+	ImGui::StyleColorsLight();
+	ImGui_ImplWin32_Init(hwnd, gl_context);
+	const char* glsl_version = "#version 410";
+	ImGui_ImplOpenGL3_Init(glsl_version);
+}
 
 #define CheckWGLDieOnError() pangolin::_CheckWLDieOnError( __FILE__, __LINE__ );
 namespace pangolin {
@@ -246,10 +265,14 @@ WinWindow::WinWindow(
     // Display Window
     ShowWindow(hWnd, SW_SHOW);
     PangolinGl::is_double_buffered = true;
+
 }
 
 WinWindow::~WinWindow()
 {
+    ImGui_ImplWin32_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui::DestroyContext();
     if(!DestroyWindow(hWnd)) {
         std::cerr << "DestroyWindow() failed" << std::endl;
         CheckWGLDieOnError();
@@ -274,11 +297,13 @@ void WinWindow::RegisterThisClass(HMODULE hCurrentInst)
         CheckWGLDieOnError();
     }
 }
+//extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT APIENTRY
 WinWindow::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     WinWindow* self = 0;
+    ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
 
     if (uMsg == WM_NCCREATE) {
         auto lpcs = reinterpret_cast<LPCREATESTRUCTA>(lParam);
@@ -310,6 +335,8 @@ LRESULT WinWindow::HandleWinMessages(UINT message, WPARAM wParam, LPARAM lParam)
         SetupPixelFormat(hDC);
         SetupPalette(hDC);
         hGLRC = wglCreateContext(hDC);
+        
+        imgui_initialize(hWnd, hGLRC);
         if(!hGLRC) {
             std::cerr << "WM_CREATE wglCreateContext() failed" << std::endl;
             CheckWGLDieOnError();
@@ -344,6 +371,7 @@ LRESULT WinWindow::HandleWinMessages(UINT message, WPARAM wParam, LPARAM lParam)
         }
         return 0;
     case WM_PALETTECHANGED:
+    //    break;
         /* realize palette if this is *not* the current window */
         if (hGLRC && hPalette && (HWND)wParam != hWnd) {
             if(!UnrealizeObject(hPalette)) {
@@ -360,6 +388,7 @@ LRESULT WinWindow::HandleWinMessages(UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_QUERYNEWPALETTE:
+   //     break;
         /* realize palette if this is the current window */
         if (hGLRC && hPalette) {
             if(!UnrealizeObject(hPalette)) {
