@@ -589,11 +589,11 @@ std::chrono::milliseconds View::GetDurationSinceLastRender() {
 
 void View::RecordDurationSinceLastRender() {
 
-    if (!timepoint_for_last_render) {
+    if (timepoint_for_last_render == std::chrono::steady_clock::time_point::min()) {
         timepoint_for_last_render = std::chrono::steady_clock::now();
     }
     auto end = std::chrono::steady_clock::now();
-    auto d = end - *timepoint_for_last_render;
+    auto d = end - timepoint_for_last_render;
     timepoint_for_last_render = end;
     duration_since_last_render =  std::chrono::duration_cast<std::chrono::milliseconds>(d);
 }

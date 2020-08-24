@@ -30,7 +30,6 @@
 #include <functional>
 #include <vector>
 #include <chrono>
-#include <pangolin/compat/optional.h>
 #include <pangolin/display/viewport.h>
 #include <pangolin/display/attach.h>
 
@@ -234,7 +233,7 @@ private:
     View(View&) { /* Do Not copy - take reference instead*/ }
     
     bool scroll_show;
-    pangolin::optional<std::chrono::time_point<std::chrono::steady_clock>> timepoint_for_last_render;
+    std::chrono::time_point<std::chrono::steady_clock> timepoint_for_last_render = std::chrono::steady_clock::time_point::min();
     std::chrono::milliseconds duration_since_last_render;
 };
 
