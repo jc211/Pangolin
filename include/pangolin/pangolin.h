@@ -37,6 +37,7 @@
   #include <pangolin/gl/colour.h>
   #include <pangolin/display/display.h>
   #include <pangolin/display/view.h>
+  #include <imgui.h>
   #ifdef _ANDROID_
     #include <pangolin/display/device/display_android.h>
   #endif

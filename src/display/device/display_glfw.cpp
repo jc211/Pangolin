@@ -31,6 +31,7 @@
 #include <pangolin/display/display.h>
 #include <pangolin/display/display_internal.h>
 
+
 #include <pangolin/display/device/GLFWWindow.h>
 #include <memory>
 #include <GLFW/glfw3.h>
@@ -148,26 +149,33 @@ GLFWWindow::GLFWWindow(
     glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
         auto self = (GLFWWindow*)glfwGetWindowUserPointer(window);
         self->quit = true;
-        });
+    });
 
     glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
         //auto self = (GLFWWindow*)glfwGetWindowUserPointer(m_window);
         process::Resize(width, height);    
     });
+
     glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods){
         if (_imgui_has_control())
             return;
-		
+
+		auto self = (GLFWWindow*)glfwGetWindowUserPointer(window);
+
         unsigned char pangokey = GetPangoKey(key, scancode);
         if(pangokey>0) {
             if (action == GLFW_PRESS) {
-                process::Keyboard(key, 1, 1);
+             //   self->m_key_pressed = true;
+               // process::Keyboard(key, 1, 1);
+             //   ImGui::GetKey
             }
             else if (action == GLFW_RELEASE) {
-                process::KeyboardUp(key, 1, 1);
+              //  self->m_key_pressed = false;
+             //   process::KeyboardUp(key, 1, 1);
             }
         }
     });
+
     glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods){
         if (_imgui_has_control())
             return;
@@ -240,6 +248,20 @@ void GLFWWindow::InitializeFrame() {
    ImGui_ImplOpenGL3_NewFrame();
    ImGui_ImplGlfw_NewFrame();
    ImGui::NewFrame();
+
+   // Keybord control
+   auto& io = ImGui::GetIO();
+   if (!_imgui_has_control()) {
+       for (int i = 0; i < IM_ARRAYSIZE(io.KeysDown); i++) if (io.KeysDownDuration[i] >= 0.0f)     { 
+           if (ImGui::IsKeyDown(i)) {
+                process::Keyboard(i, 1, 1);
+           }
+           else if (ImGui::IsKeyReleased(i)) {
+               process::KeyboardUp(i, 1, 1);
+           }
+       }
+   }
+   
 }
 
 void GLFWWindow::ToggleFullscreen()

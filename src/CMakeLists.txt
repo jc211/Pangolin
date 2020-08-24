@@ -209,6 +209,8 @@ else()
             list(APPEND LINK_LIBS glfw )
             list(APPEND WINDOW_FACTORY_REG RegisterGLFWWindowFactory)
             list(APPEND SOURCES display/device/display_glfw.cpp )
+            include("../include/imgui/CMakeLists.txt")
+            list(APPEND SOURCES ${IMGUI_SRC})
             #list(APPEND WINDOW_FACTORY_REG RegisterWinWindowFactory)
             #list(APPEND SOURCES display/device/display_win.cpp )
         elseif(_OSX_)
@@ -620,8 +622,6 @@ if(BUILD_PANGOLIN_LZ4)
   endif()
 endif()
 
-list(APPEND LINK_LIBS imgui )
-
 #######################################################
 ## Embed resource binary files
 
@@ -644,8 +644,12 @@ target_include_directories(${LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SO
                                                   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
                                                   $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>)
 
-target_link_libraries(${LIBRARY_NAME} PUBLIC ${LINK_LIBS})
+target_include_directories(${LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/imgui>
+$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/imgui>
+$<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>/imgui)
 
+target_link_libraries(${LIBRARY_NAME} PUBLIC ${LINK_LIBS})
+set_property(TARGET ${LIBRARY_NAME} PROPERTY CXX_STANDARD 17)
 ## Generate symbol export helper header on MSVC
 IF(MSVC)
     string(TOUPPER ${LIBRARY_NAME} LIBRARY_NAME_CAPS)
@@ -767,7 +771,7 @@ install(DIRECTORY ${INCDIR}
 )
 
 
-install(TARGETS ${LIBRARY_NAME} imgui
+install(TARGETS ${LIBRARY_NAME}
   EXPORT ${PROJECT_NAME}Targets
   RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
   LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib

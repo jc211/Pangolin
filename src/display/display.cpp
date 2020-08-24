@@ -452,7 +452,7 @@ namespace process
 float last_x = 0;
 float last_y = 0;
 
-void Keyboard( unsigned char key, int x, int y)
+void Keyboard( unsigned char key, int x, int y, std::chrono::milliseconds time_since_last_update)
 {
     // Force coords to match OpenGl Window Coords
     y = context->base.v.h - y;

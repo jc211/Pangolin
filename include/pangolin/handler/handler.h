@@ -80,6 +80,8 @@ struct PANGOLIN_EXPORT Handler3D : Handler
     void Mouse(View&, MouseButton button, int x, int y, bool pressed, int button_state);
     void MouseMotion(View&, int x, int y, int button_state);
     void Special(View&, InputSpecial inType, float x, float y, float p1, float p2, float p3, float p4, int button_state);
+
+    void SetSpeed(float speed);
     
 #ifdef USE_EIGEN
     // Return selected point in world coordinates
@@ -108,6 +110,7 @@ protected:
     GLprecision n[3];
 
     int funcKeyState;
+    float speed = 1.0;
 };
 
 static Handler StaticHandler;

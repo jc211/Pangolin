@@ -35,6 +35,7 @@
 #include <pangolin/gl/gl.h>
 
 #include <functional>
+#include <chrono>
 
 namespace pangolin
 {

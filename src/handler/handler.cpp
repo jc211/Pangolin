@@ -89,6 +89,8 @@ void Handler::Special(View& d, InputSpecial inType, float x, float y, float p1, 
     }
 }
 
+
+
 void HandlerScroll::Mouse(View& d, MouseButton button, int x, int y, bool pressed, int button_state)
 {
     if( pressed && (button == MouseWheelUp || button == MouseWheelDown) )
@@ -120,9 +122,36 @@ Handler3D::Handler3D(OpenGlRenderState& cam_state, AxisDirection enforce_up, flo
     SetZero<3,1>(rot_center);
 }
 
-void Handler3D::Keyboard(View&, unsigned char /*key*/, int /*x*/, int /*y*/, bool /*pressed*/)
+void Handler3D::Keyboard(View& v, unsigned char key, int x, int y, bool pressed)
 {
-    // TODO: hooks for reset / changing mode (perspective / ortho etc)
+    auto dt = v.GetDurationSinceLastRender().count()/1000.0f;
+    OpenGlMatrix& mv = cam_state->GetModelViewMatrix();
+    const GLprecision* up = AxisDirectionVector[enforce_up];
+    GLprecision T_nc[3*4];
+    LieSetIdentity(T_nc);
+    GLprecision t[] = { 0, 0, 0 };
+    if( key == 'W' )
+    {
+        t[2] = speed*dt;
+    }
+    else if( key == 'S' )
+    {
+        t[2] = -speed*dt;
+    } else if( key == 'A' )
+    {
+        t[0] = speed*dt;
+    }
+    else if (key == 'D') {
+        t[0] = -speed*dt;
+    }
+    else if (key == 'Q') {
+        t[1] = -speed*dt;
+    }
+    else if (key == 'Z') {
+        t[1] = +speed*dt;
+    }
+    LieSetTranslation<>(T_nc, t);
+    LieMul4x4bySE3<>(mv.m, T_nc, mv.m);
 }
 
 bool Handler3D::ValidWinDepth(GLprecision depth)
@@ -338,6 +367,10 @@ void Handler3D::MouseMotion(View& display, int x, int y, int button_state)
     
     last_pos[0] = (float)x;
     last_pos[1] = (float)y;
+}
+
+void Handler3D::SetSpeed(float s) {
+    speed = s;
 }
 
 void Handler3D::Special(View& display, InputSpecial inType, float x, float y, float p1, float p2, float /*p3*/, float /*p4*/, int button_state)

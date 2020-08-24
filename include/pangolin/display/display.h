@@ -36,6 +36,7 @@
 #include <functional>
 #include <string>
 #include <memory>
+#include <chrono>
 
 /*! \file display.h
  * This file contains a number of global methods for creating and
@@ -139,7 +140,7 @@ namespace pangolin
     /// You will need to call this manually if you haven't let
     /// Pangolin register callbacks from your windowing system
     PANGOLIN_EXPORT
-    void Keyboard( unsigned char key, int x, int y);
+    void Keyboard( unsigned char key, int x, int y, std::chrono::milliseconds time_since_last_update = std::chrono::milliseconds(0));
 
     PANGOLIN_EXPORT
     void KeyboardUp(unsigned char key, int x, int y);

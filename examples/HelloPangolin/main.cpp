@@ -1,7 +1,4 @@
 #include <pangolin/pangolin.h>
-#include <imgui.h>
-//#include <imgui_impl_opengl3.h>
-//#include <imgui_impl_win32.h>
 
 void draw_central_dockspace() {
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
@@ -35,6 +32,8 @@ int main( int /*argc*/, char** /*argv*/ )
 
     // Create Interactive View in window
     pangolin::Handler3D handler(s_cam);
+    handler.SetSpeed(10.0);
+
     pangolin::View& d_cam = pangolin::CreateDisplay()
             .SetBounds(0.0, 1.0, 0.0, 1.0, -640.0f/480.0f)
             .SetHandler(&handler);

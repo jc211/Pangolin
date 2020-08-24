@@ -21,7 +21,7 @@ option( BUILD_TESTS "Build Tests" ON )
 option( BUILD_TOOLS "Build Examples" ON )
 option( BUILD_EXAMPLES "Build Tools" ON )
 
-add_subdirectory("imgui")
+
 if(_WIN_)
     option( BUILD_SHARED_LIBS    "Build Shared Library" OFF)
     option( BUILD_EXTERN_GLEW    "Automatically download, build and compile GLEW" OFF)

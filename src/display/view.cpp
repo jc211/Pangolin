@@ -291,6 +291,8 @@ void View::ResizeChildren()
 
 void View::Render()
 {
+
+    RecordDurationSinceLastRender();
     if(extern_draw_function && show && scroll_show) {
         extern_draw_function(*this);
     }
@@ -578,6 +580,22 @@ View& View::SetDrawFunction(const std::function<void(View&)>& drawFunc)
 {
     extern_draw_function = drawFunc;
     return *this;
+}
+
+std::chrono::milliseconds View::GetDurationSinceLastRender() {
+
+    return duration_since_last_render;
+}
+
+void View::RecordDurationSinceLastRender() {
+
+    if (!timepoint_for_last_render) {
+        timepoint_for_last_render = std::chrono::steady_clock::now();
+    }
+    auto end = std::chrono::steady_clock::now();
+    auto d = end - *timepoint_for_last_render;
+    timepoint_for_last_render = end;
+    duration_since_last_render =  std::chrono::duration_cast<std::chrono::milliseconds>(d);
 }
 
 }
