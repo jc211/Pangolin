@@ -1,7 +1,7 @@
 include(ExternalProject)
 
 set(ExternConfig "")
-
+if( BUILD_EXTERN_GLFW )
 #########################################################
 # GLFW
 #########################################################
@@ -37,6 +37,7 @@ set(ExternConfig "${ExternConfig}
     IMPORTED_LOCATION_RELEASE \"${CMAKE_INSTALL_PREFIX}/lib/glfw.lib\"
     IMPORTED_LOCATION_DEBUG   \"${CMAKE_INSTALL_PREFIX}/lib/glfw.lib\"
   )")
+ endif()
 
 if( BUILD_EXTERN_GLEW )
 
