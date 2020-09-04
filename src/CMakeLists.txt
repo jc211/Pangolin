@@ -205,8 +205,10 @@ elseif(IOS)
 else()
     if(BUILD_PANGOLIN_GUI)
         if(_WIN_)
-            find_package(glfw3 REQUIRED)
-            list(APPEND LINK_LIBS glfw )
+            include(CMakeFindDependencyMacro)
+            find_dependency(glfw3 REQUIRED)
+                
+            list(APPEND LINK_LIBS )
             list(APPEND WINDOW_FACTORY_REG RegisterGLFWWindowFactory)
             list(APPEND SOURCES display/device/display_glfw.cpp )
             include("../include/imgui/CMakeLists.txt")
@@ -649,7 +651,7 @@ target_include_directories(${LIBRARY_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SO
 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/imgui>
 $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>/${LIBRARY_NAME}/imgui)
 
-target_link_libraries(${LIBRARY_NAME} PUBLIC ${LINK_LIBS})
+target_link_libraries(${LIBRARY_NAME} PUBLIC glfw ${LINK_LIBS} )
 
 ## Generate symbol export helper header on MSVC
 IF(MSVC)

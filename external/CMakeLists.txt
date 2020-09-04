@@ -2,6 +2,42 @@ include(ExternalProject)
 
 set(ExternConfig "")
 
+#########################################################
+# GLFW
+#########################################################
+ExternalProject_Add( __glfw
+  PREFIX "${CMAKE_CURRENT_BINARY_DIR}/glfw"
+  GIT_REPOSITORY https://github.com/glfw/glfw.git
+  GIT_TAG bb1d917c2fc0db03debf77c711fc37bef5231c88
+  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+             -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
+             -DCMAKE_C_FLAGS_DEBUG=${CMAKE_C_FLAGS_DEBUG}
+             -DCMAKE_C_FLAGS_MINSIZEREL=${CMAKE_C_FLAGS_MINSIZEREL}
+             -DCMAKE_C_FLAGS_RELWITHDEBINFO=${CMAKE_C_FLAGS_RELWITHDEBINFO}
+)
+
+add_library(_glfw STATIC IMPORTED GLOBAL)
+add_dependencies(_glfw __glfw)
+set_target_properties(_glfw PROPERTIES
+    IMPORTED_LOCATION_RELWITHDEBINFO ${CMAKE_INSTALL_PREFIX}/lib/glfw.lib
+    IMPORTED_LOCATION_RELEASE ${CMAKE_INSTALL_PREFIX}/lib/glfw.lib
+    IMPORTED_LOCATION_DEBUG   ${CMAKE_INSTALL_PREFIX}/lib/glfw.lib
+)
+
+set(GLFW_FOUND true PARENT_SCOPE)
+set(GLFW_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include" PARENT_SCOPE)
+set(GLFW_LIBRARY __glfw PARENT_SCOPE)
+set(GLFW_STATIC 1 PARENT_SCOPE)
+set(ExternConfig "${ExternConfig}
+  add_library(__glfw STATIC IMPORTED)
+  set_target_properties(__glfw PROPERTIES
+    IMPORTED_LOCATION_RELWITHDEBINFO \"${CMAKE_INSTALL_PREFIX}/lib/glfw.lib\"
+    IMPORTED_LOCATION_RELEASE \"${CMAKE_INSTALL_PREFIX}/lib/glfw.lib\"
+    IMPORTED_LOCATION_DEBUG   \"${CMAKE_INSTALL_PREFIX}/lib/glfw.lib\"
+  )")
+
 if( BUILD_EXTERN_GLEW )
 
 #########################################################
