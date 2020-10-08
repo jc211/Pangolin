@@ -1,4 +1,5 @@
 #include <pangolin/pangolin.h>
+#include <implot.h>
 
 void draw_central_dockspace() {
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
@@ -44,6 +45,7 @@ int main( int /*argc*/, char** /*argv*/ )
         draw_central_dockspace();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         ImGui::ShowDemoWindow();
+        ImPlot::ShowDemoWindow();
         d_cam.Activate(s_cam);
         pangolin::glDrawColouredCube();
         pangolin::FinishFrame();

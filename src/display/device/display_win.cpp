@@ -33,6 +33,7 @@
 
 #include <pangolin/display/device/WinWindow.h>
 #include <memory>
+#include <implot.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_win32.h>
@@ -42,6 +43,7 @@ static void imgui_initialize(void* hwnd, void* gl_context) {
 	//ImGui_ImplWin32_EnableDpiAwareness();
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+    ImPlot::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -272,6 +274,7 @@ WinWindow::~WinWindow()
 {
     ImGui_ImplWin32_Shutdown();
 	ImGui_ImplOpenGL3_Shutdown();
+    ImPlot::DestroyContext();
 	ImGui::DestroyContext();
     if(!DestroyWindow(hWnd)) {
         std::cerr << "DestroyWindow() failed" << std::endl;
