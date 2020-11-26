@@ -204,10 +204,8 @@ elseif(IOS)
     # Nothing specific in here yet.
 else()
     if(BUILD_PANGOLIN_GUI)
-        if(_WIN_)
             include(CMakeFindDependencyMacro)
             find_dependency(glfw3 REQUIRED)
-                
             list(APPEND LINK_LIBS )
             list(APPEND WINDOW_FACTORY_REG RegisterGLFWWindowFactory)
             list(APPEND SOURCES display/device/display_glfw.cpp )
@@ -215,76 +213,6 @@ else()
             list(APPEND SOURCES ${IMGUI_SRC})
             #list(APPEND WINDOW_FACTORY_REG RegisterWinWindowFactory)
             #list(APPEND SOURCES display/device/display_win.cpp )
-        elseif(_OSX_)
-            list(APPEND WINDOW_FACTORY_REG RegisterOsxWindowFactory)
-            list(APPEND SOURCES display/device/display_osx.mm display/device/PangolinNSApplication.mm display/device/PangolinNSGLView.mm  )
-            list(APPEND LINK_LIBS "-framework Cocoa" )
-        elseif(_LINUX_)
-            # Wayland
-            if(DISPLAY_WAYLAND)
-                find_package(Wayland QUIET)
-                if(WAYLAND_CLIENT_FOUND)
-                    find_package(Wayland REQUIRED)
-                    find_package(PkgConfig)
-                    pkg_check_modules(xkbcommon REQUIRED xkbcommon)
-                    pkg_check_modules(egl QUIET egl)
-
-                    # find Wayland protocols
-                    pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
-
-                    # generate header for protocol 'xdg_shell'
-                    set(XDG_PROT_DEF "${WAYLAND_PROTOCOLS_DIR}/stable/xdg-shell/xdg-shell.xml")
-                    if(EXISTS ${XDG_PROT_DEF})
-                        # use the 'xdg_shell' protocol
-                        add_definitions(-DUSE_WL_XDG=1)
-
-                        # find 'wayland-scanner' executable
-                        pkg_get_variable(WAYLAND_SCANNER wayland-scanner wayland_scanner)
-
-                        # generate protocol implementation
-                        add_custom_command(
-                            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-client-protocol.h
-                            COMMAND ${WAYLAND_SCANNER} client-header ${XDG_PROT_DEF} xdg-shell-client-protocol.h)
-                        add_custom_command(
-                            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/xdg-shell-protocol.c
-                            COMMAND ${WAYLAND_SCANNER} private-code ${XDG_PROT_DEF} xdg-shell-protocol.c
-                            DEPENDS xdg-shell-client-protocol.h)
-                        include_directories(${CMAKE_CURRENT_BINARY_DIR})
-                        list(APPEND SOURCES xdg-shell-protocol.c)
-
-                    else()
-                        # use deprecated 'wl_shell' interface
-                        add_definitions(-DUSE_WL_XDG=0)
-                    endif()
-
-                    list(APPEND WINDOW_FACTORY_REG RegisterWaylandWindowFactory)
-                    list(APPEND SOURCES display/device/display_wayland.cpp)
-                    list(APPEND LINK_LIBS
-                        ${WAYLAND_CLIENT_LIBRARIES}
-                        ${WAYLAND_EGL_LIBRARIES}
-                        ${WAYLAND_CURSOR_LIBRARIES}
-                        ${egl_LIBRARIES}
-                        ${xkbcommon_LIBRARIES}
-                    )
-                    list(APPEND INTERNAL_INC
-                        ${WAYLAND_CLIENT_INCLUDE_DIR}
-                        ${WAYLAND_EGL_INCLUDE_DIR}
-                        ${WAYLAND_CURSOR_INCLUDE_DIR}
-                        ${egl_INCLUDE_DIRS}
-                        ${xkbcommon_INCLUDE_DIRS}
-                    )
-                endif()
-            endif()
-
-            # X11
-            find_package(X11 QUIET)
-            if(DISPLAY_X11 AND X11_FOUND)
-                list(APPEND WINDOW_FACTORY_REG RegisterX11WindowFactory)
-                list(APPEND USER_INC ${X11_INCLUDE_DIR})
-                list(APPEND SOURCES display/device/display_x11.cpp )
-                list(APPEND LINK_LIBS ${X11_LIBRARIES} )
-            endif()
-        endif()
     endif()
 endif()
 
@@ -389,9 +317,9 @@ if(BUILD_PANGOLIN_V4L AND BUILD_PANGOLIN_VIDEO AND _LINUX_)
   message(STATUS "V4L Found and Enabled")
 endif()
 
-option(BUILD_PANGOLIN_FFMPEG "Build support for ffmpeg video input" ON)
+option(BUILD_PANGOLIN_FFMPEG "Build support for ffmpeg video input" OFF)
 if(BUILD_PANGOLIN_FFMPEG AND BUILD_PANGOLIN_VIDEO)
-  find_package(FFMPEG QUIET)
+  find_package(FFMPEG REQUIRED)
   if(FFMPEG_FOUND)
     set(HAVE_FFMPEG 1)
     list(APPEND INTERNAL_INC  ${FFMPEG_INCLUDE_DIRS} )

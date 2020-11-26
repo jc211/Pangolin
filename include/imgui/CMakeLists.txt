@@ -10,5 +10,4 @@ ${CMAKE_CURRENT_LIST_DIR}/imgui_widgets.cpp
 ${CMAKE_CURRENT_LIST_DIR}/implot.cpp
 ${CMAKE_CURRENT_LIST_DIR}/implot_demo.cpp
 ${CMAKE_CURRENT_LIST_DIR}/implot_items.cpp
-${CMAKE_CURRENT_LIST_DIR}/ImGuiFileDialog.cpp
 )

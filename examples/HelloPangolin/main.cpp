@@ -44,8 +44,13 @@ int main( int /*argc*/, char** /*argv*/ )
         pangolin::StartFrame();
         draw_central_dockspace();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        ImGui::ShowDemoWindow();
+
         ImPlot::ShowDemoWindow();
+        ImGui::Begin("Test");
+        ImGui::Text("Hello World");
+        ImGui::End();
+
+        ImGui::ShowDemoWindow();
         d_cam.Activate(s_cam);
         pangolin::glDrawColouredCube();
         pangolin::FinishFrame();

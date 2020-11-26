@@ -2684,7 +2684,7 @@ bool LineX(const char* id, double value, bool show_label, const ImVec4& col, flo
     const bool outside = x < (gp.BB_Plot.Min.x - grab_size / 2) || x > (gp.BB_Plot.Max.x + grab_size / 2);
     if (outside)
         return false;
-    float len = gp.Style.MajorTickLen.x;
+//    float len = gp.Style.MajorTickLen.x;
     ImVec4 color = IsColorAuto(col) ? ImGui::GetStyleColorVec4(ImGuiCol_Text) : col;
     ImU32 col32 = ImGui::ColorConvertFloat4ToU32(color);
     ImDrawList& DrawList = *GetPlotDrawList();
@@ -2729,7 +2729,7 @@ bool LineY(const char* id, double value, bool show_label, const ImVec4& col, flo
     const bool outside = y < (gp.BB_Plot.Min.y - grab_size / 2) || y > (gp.BB_Plot.Max.y + grab_size / 2);
     if (outside)
         return false;
-    float len = gp.Style.MajorTickLen.y;
+//    float len = gp.Style.MajorTickLen.y;
     ImVec4 color = IsColorAuto(col) ? ImGui::GetStyleColorVec4(ImGuiCol_Text) : col;
     ImU32 col32 = ImGui::ColorConvertFloat4ToU32(color);
     ImDrawList& DrawList = *GetPlotDrawList();
